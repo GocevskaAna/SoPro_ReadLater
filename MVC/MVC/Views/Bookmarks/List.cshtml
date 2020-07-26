@@ -1,0 +1,126 @@
+﻿@using ReadLater.Entities;
+
+@{
+
+    ViewBag.Title = "List";
+    Dictionary<string, List<Bookmark>> BookmarksPerCategory = (Dictionary<string, List<Bookmark>>)ViewData["BookmarksPerCategory"];
+    var Counter = BookmarksPerCategory.Count;
+    var Index = 0;
+}
+
+<div style="margin-bottom:30px">
+    <h2 style="text-transform:uppercase; font-size:18px; font-weight:bold"><i class="far fa-bookmark"></i> Bookmarks per Category</h2>
+</div>
+
+<div>
+    <a href="/Bookmarks/NewBookmark" class="btn btn-outline-success">New Bookmark</a>
+</div>
+<div id="accordion" style="margin-top:10px">
+    <div class="card">
+       
+            @foreach (KeyValuePair<string, List<Bookmark>> entry in BookmarksPerCategory)
+            {
+                if (Index < Counter)
+                { 
+                    <div class="card-header bookmark_title" id="heading_@Index.ToString()">
+                        <h5 class="mb-0">
+                            <button class="btn" data-toggle="collapse" data-target="#collapse_@Index.ToString()" aria-expanded="true" aria-controls="collapse_@Index.ToString()" style="text-transform:uppercase; font-size:16px; color:#343a40; font-weight:bold">
+                                <i class="far fa-folder-open"></i> @entry.Key
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapse_@Index.ToString()" class="collapse show" aria-labelledby="heading_@Index.ToString()" data-parent="#accordion">
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>URL</th>
+                                        <th>Name</th>
+                                        <th>Create Date</th>
+                                        <th colspan="2"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (Bookmark bookmark in entry.Value)
+                                    {
+
+                                        <tr>
+                                            <td class="w-50"><a href="http://@bookmark.URL">@bookmark.URL</a></td>
+                                            <td>@bookmark.ShortDescription</td>
+                                            <td>@bookmark.CreateDate</td>
+                                            <td class="btn btn_edit" onclick="EditBookmark(@bookmark.ID)"><i class="fas fa-pencil-alt"></i></td>
+                                            <td class="btn btn_delete" data-toggle='modal' data-target='#deleteModal' data-bookmark-id=@bookmark.ID><i class="fas fa-trash-alt"></i></td>
+                                        </tr>
+
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    Index++;
+                }
+            }
+    </div>
+    
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete bookmark</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this bookmark?
+                <input type="hidden" id="userToDeleteId" name="userToDeleteId" value="" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="DeleteBookmark()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+          $('#deleteModal').on('show.bs.modal', function(e) {
+            var userId = $(e.relatedTarget).data('bookmark-id');
+            $(e.currentTarget).find('input[name="userToDeleteId"]').val(userId);
+        });
+    })
+
+    function EditBookmark(bookmarkID) {
+        window.location.href = "/Bookmarks/EditBookmark?bookmarkID=" + bookmarkID;
+    }
+
+    function DeleteBookmark() {
+
+        var id = $("#userToDeleteId").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/Bookmarks/Delete?id=" + id + "",
+            contentType: "json",
+            dataType: "json",
+            success: function (data) {
+                if (data.message = "ok") {
+                     window.location.href = '@Url.Action("List", "Bookmarks")';
+                }
+               
+            },
+            error: function (xhr) {
+                alert(xhr.responseText);
+            }
+        });
+    }
+</script>
+
+

@@ -22,3 +22,40 @@ select,
 textarea {
     max-width: 280px;
 }
+
+/*Bookmarks List*/
+
+.bookmark_title button:hover {
+    color: #2896eb!important;
+}
+
+.btn_edit i:hover {
+    color: #d1cc2a!important;
+}
+
+.btn_delete i:hover {
+    color: #eb2828;
+}
+
+.btn_details i:hover {
+    color: #8dc7bb;
+}
+
+#btnAddNewCategory {
+    border-radius: 50%;
+    color: white;
+    background-color: #32a852;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+    font-size: 20px;
+    text-align: center;
+    margin-top:-4px
+}
+
+
+#btnAddNewCategory:hover {
+    background-color: white !important;
+    border: 1px solid #32a852 !important;
+    color: #32a852 !important;
+}

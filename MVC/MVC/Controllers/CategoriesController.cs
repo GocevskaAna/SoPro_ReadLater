@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using ReadLater.Data;
@@ -12,12 +13,15 @@ using ReadLater.Services;
 
 namespace MVC.Controllers
 {
+    [Authorize]
     public class CategoriesController : Controller
     {
         ICategoryService _categoryService;
-        public CategoriesController(ICategoryService categoryService)
+        ICateogoriesPerUser _categoriesPerUserService;
+        public CategoriesController(ICategoryService categoryService, ICateogoriesPerUser categoriesPerUserService)
         {
             _categoryService = categoryService;
+            _categoriesPerUserService = categoriesPerUserService;
         }
         // GET: Categories
         public ActionResult Index()
@@ -48,16 +52,25 @@ namespace MVC.Controllers
             return View();
         }
 
-        // POST: Categories/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        //POST: Categories/Create
+        //To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "ID,Name")] Category category)
         {
+            var claimsIdentity = (ClaimsIdentity)this.User.Identity;
+            var claim = claimsIdentity.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            var userId = claim.Value;
+
             if (ModelState.IsValid)
             {
                 _categoryService.CreateCategory(category);
+
+                CategoriesPerUser newCategoriesPerUser = new CategoriesPerUser();
+                newCategoriesPerUser.UserID = userId;
+                newCategoriesPerUser.CategoryID = category.ID;
+                _categoriesPerUserService.CreateCategoriesPerUser(newCategoriesPerUser);
                 return RedirectToAction("Index");
             }
 

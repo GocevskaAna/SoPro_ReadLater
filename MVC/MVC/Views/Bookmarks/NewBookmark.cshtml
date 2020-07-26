@@ -1,0 +1,113 @@
+﻿@using ReadLater.Entities;
+@model MVC.Models.BookmarkFromCategory
+
+@{
+    ViewBag.Title = "NewBookmark";
+    List<Category> Categories = (List<Category>)ViewData["Categories"];
+    string UserId = Session["LoggedInUserID"].ToString();
+    var SelectedCategoryName = "";
+}
+
+<h2 style="text-transform:uppercase; font-size:18px; font-weight:bold;padding:10px">Add new bookmark</h2>
+
+<div class="container">
+    <form>
+        <input type="hidden" id="UserId" value="@UserId" />
+        @Html.HiddenFor(model => model.UserId, new { htmlAttributes = new { @class = "form-control", @id = "UserId", @Value = UserId, @required = "required" } })
+        <div class="form-row">
+            <div class="form-group">
+                <label for="txtURL">URL</label>
+                @Html.EditorFor(model => model.URL, new { htmlAttributes = new { @class = "form-control w-100", @id = "txtURL", @placeholder = "https://www.google.com/", @required = "required" } })
+            </div>
+            <div class="form-group">
+                <label for="txtShortDesc" class="ml-4">Short Description</label>
+                @Html.EditorFor(model => model.ShortDescription, new { htmlAttributes = new { @class = "form-control w-100 ml-4", @id = "txtShortDesc", @placeholder = "Enter a name for this bookmark", @required = "required" } })
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group w-25">
+                <label for="ddCategories" style="display:block">Categories</label>
+                <select class="form-control" id="ddCategories" name="CategoryId">
+                    @foreach (Category category in Categories)
+                    {
+                        <option value="@category.ID">@category.Name</option>
+                    }
+                </select>
+                <input type="text" id="newCategory" class="form-control" style="display:none" />
+            </div>
+
+            <div class="form-group ml-3">
+                <label for="btnModalAddNewCategory" style="display: block; color: white">Button</label>
+                <button class="btn btn-outline-info" type="button" id="btnModalAddNewCategory">Add New Category</button>
+                <button class="btn btn-outline-secondary" type="button" id="btnBack" style="display:none">Back</button>
+            </div>
+        </div>
+        <div style="display:block">
+            <a href="/Bookmarks/List" class="btn btn-outline-secondary  mb-2 mt-5" style="display:inline-block">Back</a>
+            <button type="button" class="btn btn-primary mb-2 mt-5" id="btnAddCategoryWhilstCreatingBookmark" style="display:inline-block">Save bookmark</button>
+        </div>
+    </form>
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script>
+    $("#btnAddCategoryWhilstCreatingBookmark").click(function () {
+        var CategoryId;
+        var CategoryName;
+
+        var newCategory = $("#newCategory").val();
+        if (newCategory != "") {
+            CategoryId = "";
+            CategoryName = newCategory;
+        }
+        else {
+            CategoryId = $("#ddCategories").val();
+            CategoryName = $("#ddCategories option:selected").text();
+        }
+
+        var jsonData = {
+            "URL": $("#txtURL").val(),
+            "ShortDescription": $("#txtShortDesc").val(),
+            "CategoryId": CategoryId,
+            "CategoryName": CategoryName,
+            "UserId": $("#UserId").val()
+        };
+
+        $.ajax({
+            type: "Post",
+            url: "/Bookmarks/Create",
+            contentType: 'application/json',
+            data: JSON.stringify(jsonData),
+            success: function (response) {
+
+                if (response.message = "ok") {
+                    window.location.href = "/Bookmarks/List"
+                }
+
+            }
+        })
+    })
+
+    $("#btnModalAddNewCategory").click(function () {
+        $("#ddCategories").css("display", "none");
+        $("#newCategory").css("display", "block");
+
+        $("#btnModalAddNewCategory").css("display", "none");
+        $("#btnBack").css("display", "block");
+
+    })
+
+       $("#btnBack").click(function () {
+        $("#ddCategories").css("display", "block");
+        $("#newCategory").css("display", "none");
+
+        $("#btnModalAddNewCategory").css("display", "block");
+        $("#btnBack").css("display", "none");
+
+    })
+</script>
+
+
+
+

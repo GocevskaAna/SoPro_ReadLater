@@ -41,6 +41,7 @@ namespace MVC
 
             container.Register<ICategoryService, CategoryService>(Lifestyle.Scoped);
             container.Register<IBookmarkService, BookmarkService>(Lifestyle.Scoped);
+            container.Register<ICateogoriesPerUser, CategoriesPerUserService>(Lifestyle.Scoped);
         }
 
     }

@@ -35,6 +35,30 @@ namespace ReadLater.Services
             return _unitOfWork.Repository<Category>().Query().Get().ToList();
         }
 
+        public List<Category> GetCategoriesByUserId(string Id)
+        {
+            List<CategoriesPerUser> categoriesPerUsers = _unitOfWork.Repository<CategoriesPerUser>().Query()
+                                                    .Filter(c => c.UserID == Id)
+                                                    .Get()
+                                                    .ToList();
+            List<CategoriesPerUser> distinctCPU = categoriesPerUsers.GroupBy(c => c.CategoryID).Select(c => c.FirstOrDefault()).ToList();
+
+            List<Category> categories = GetCategories();
+            List<Category> resultList = new List<Category>();
+
+            foreach(Category category in categories)
+            { 
+                foreach(CategoriesPerUser cpu in distinctCPU)
+                {
+                    if(category.ID == cpu.ID)
+                    {
+                        resultList.Add(category);
+                    }
+                }
+            }
+            return resultList;
+        }
+
         public Category GetCategory(int Id)
         {
             return _unitOfWork.Repository<Category>().Query()

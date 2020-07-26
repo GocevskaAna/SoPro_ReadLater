@@ -4,12 +4,18 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<div style="margin-bottom:30px">
+    <h2 style="text-transform:uppercase; font-size:18px; font-weight:bold">Categories</h2>
+</div>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
+
+
+<div id="btnAddNewCategory">
+    <a href="/Categories/Create" class="btn" style="color:inherit; font-weight:bold">+</a>
+</div>
+
+
+<table class="table table-striped" style="padding-top:10px">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Name)
@@ -17,17 +23,19 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            @*<td colspan="5"></td>*@
+            <td style="text-align:right">
+                <a href="/Categories/Edit/@item.ID" style="color:inherit; margin: 0px 10px;" class="btn_edit"><i class="fas fa-pencil-alt"></i></a>
+                <a href="/Categories/Details/@item.ID" style="color:inherit; margin: 0px 10px;" class="btn_details"> <i class="fas fa-search"></i></a>
+                <a href="/Categories/Delete/@item.ID" style="color:inherit; margin: 0px 10px;" class="btn_delete"> <i class="fas fa-trash-alt"></i></a>
+            </td>
+        </tr>
+    }
 
 </table>
